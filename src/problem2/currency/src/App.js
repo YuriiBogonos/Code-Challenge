@@ -1,14 +1,13 @@
-import ConverterForm from "./components/ConverterForm";
-import { currencies } from "./data/currency";
-import { user } from "./data/user";
+import React from "react";
+import CurrencySwap from "./components/CurrencySwap";
+import "./App.css";
+import { CurrencyProvider } from "./contexts/CurrencyContext";
 
-const App = () => {
+export default function App() {
+  const userId = "1";
   return (
-    <div className="currency-converter">
-      <h2 className="converter-title">Currency Swap</h2>
-      <ConverterForm user={user} currencies={currencies} />
-    </div>
+    <CurrencyProvider userId={userId}>
+      <CurrencySwap />
+    </CurrencyProvider>
   );
-};
-
-export default App;
+}

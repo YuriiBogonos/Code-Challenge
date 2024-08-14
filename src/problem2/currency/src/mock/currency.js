@@ -6,11 +6,6 @@ export const currencies = [
   },
   { currency: "bNEO", date: "2023-08-29T07:10:50.000Z", price: 7.1282679 },
   { currency: "BUSD", date: "2023-08-29T07:10:40.000Z", price: 0.999183113 },
-  {
-    currency: "BUSD",
-    date: "2023-08-29T07:10:40.000Z",
-    price: 0.9998782611186441,
-  },
   { currency: "USD", date: "2023-08-29T07:10:30.000Z", price: 1 },
   {
     currency: "ETH",
