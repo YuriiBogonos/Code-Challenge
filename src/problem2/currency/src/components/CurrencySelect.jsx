@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 const CurrencyItem = ({ currency, handleClick, selected }) => {
   return (
     <li
-      className={`relative cursor-pointer select-none py-2 pl-3 pr-9 ${
-        selected ? "bg-[#074e6e] text-white" : "text-gray-900"
+      className={`relative cursor-pointer select-none py-2 pl-3 pr-9 hover:bg-secondary-bg hover:text-white ${
+        selected ? "text-white" : "text-gray-900"
       }`}
       onClick={() => handleClick(currency)}
     >
@@ -22,11 +22,11 @@ const CurrencyItem = ({ currency, handleClick, selected }) => {
 
 const CurrencySelect = ({ selectedCurrency, handleCurrency, currencies }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const ulRef = useRef(null);
+  const listRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (ulRef.current && !ulRef.current.contains(e.target)) {
+      if (listRef.current && !listRef.current.contains(e.target)) {
         setIsOpen(false);
       }
     };
@@ -35,7 +35,7 @@ const CurrencySelect = ({ selectedCurrency, handleCurrency, currencies }) => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [ulRef]);
+  }, [listRef]);
 
   const handleSelect = (currency) => {
     handleCurrency({ target: { value: currency } });
@@ -45,8 +45,7 @@ const CurrencySelect = ({ selectedCurrency, handleCurrency, currencies }) => {
   return (
     <div className="relative mt-2 min-h-14 ">
       <button
-        type="button"
-        className="min-h-14 relative w-full cursor-default rounded-full bg-[#074e6e] py-1.5 pl-3 pr-10 text-left text-white shadow-sm outline-none sm:text-sm sm:leading-6"
+        className="min-h-14 relative w-full cursor-default rounded-full bg-button-bg/90 hover:bg-button-bg py-1.5 pl-3 pr-10 text-left text-white shadow-sm outline-none sm:text-sm sm:leading-6"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="flex items-center">
@@ -58,25 +57,14 @@ const CurrencySelect = ({ selectedCurrency, handleCurrency, currencies }) => {
           <span className="ml-3 block truncate">{selectedCurrency}</span>
         </span>
         <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
-          <svg
-            className="h-5 w-5 text-white"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
-              clipRule="evenodd"
-            />
-          </svg>
+          <ArrowSvg />
         </span>
       </button>
 
       {isOpen && (
         <ul
-          ref={ulRef}
-          className="scrollable absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-[#074e6e] py-1 text-base shadow-lg outline-none sm:text-sm"
+          ref={listRef}
+          className="scrollable absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-button-bg py-1 text-base shadow-lg outline-none sm:text-sm"
         >
           {currencies.map((currency) => (
             <CurrencyItem
@@ -91,5 +79,20 @@ const CurrencySelect = ({ selectedCurrency, handleCurrency, currencies }) => {
     </div>
   );
 };
+
+const ArrowSvg = () => (
+  <svg
+    className="h-5 w-5 text-white"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    aria-hidden="true"
+  >
+    <path
+      fillRule="evenodd"
+      d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z"
+      clipRule="evenodd"
+    />
+  </svg>
+);
 
 export default CurrencySelect;

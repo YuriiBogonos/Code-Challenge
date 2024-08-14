@@ -11,7 +11,6 @@ const CurrencyContext = createContext({
   currencies: [],
   user: null,
   isLoading: false,
-  isLoaded: false,
   error: null,
 });
 
@@ -19,7 +18,6 @@ export function CurrencyProvider({ children, userId }) {
   const [currencies, setCurrencies] = useState([]);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -36,7 +34,6 @@ export function CurrencyProvider({ children, userId }) {
         setError(err);
       } finally {
         setIsLoading(false);
-        setIsLoaded(true);
       }
     };
 
@@ -58,7 +55,7 @@ export function CurrencyProvider({ children, userId }) {
 
   return (
     <CurrencyContext.Provider
-      value={{ currencies, user, isLoading, error, isLoaded, swap }}
+      value={{ currencies, user, isLoading, error, swap }}
     >
       {children}
     </CurrencyContext.Provider>

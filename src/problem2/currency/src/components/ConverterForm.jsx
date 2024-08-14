@@ -2,12 +2,13 @@ import { useCallback, useState } from "react";
 import CurrencyInput from "react-currency-input-field";
 import CurrencySelect from "./CurrencySelect";
 import { useCurrency } from "../contexts/CurrencyContext";
+import { Error } from "./UI/Error";
 
 const ConverterForm = ({ user, currencies, from, initialAmount, ...rest }) => {
   const { swap } = useCurrency();
   const [amount, setAmount] = useState(initialAmount || 0);
   const [fromCurrency, setFromCurrency] = useState(from || "USD");
-  const [toCurrency, setToCurrency] = useState(from || "USD");
+  const [toCurrency, setToCurrency] = useState(from || "BUSD");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
 
@@ -16,23 +17,39 @@ const ConverterForm = ({ user, currencies, from, initialAmount, ...rest }) => {
     setToCurrency(fromCurrency);
   }, [fromCurrency, toCurrency]);
 
+  const handleAmountChange = useCallback(
+    (value, _, values) => {
+      setAmount(values.float || 0);
+
+      if (
+        values.float > getUserBalance(user.wallet, fromCurrency) ||
+        getUserBalance(user.wallet, fromCurrency) === 0
+      ) {
+        return setErrorMsg("Insufficient balance!");
+      } else {
+        setErrorMsg(null);
+      }
+      value ? setErrorMsg(null) : setErrorMsg("Please enter a number!");
+    },
+    [user.wallet, fromCurrency]
+  );
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsLoading(true);
     try {
-      await swap({ fromCurrency, toCurrency, amount: +amount });
+      await swap({ fromCurrency, toCurrency, amount });
     } catch (err) {
-      console.error(err);
+      setErrorMsg(err.message);
     }
     setIsLoading(false);
-    return false;
   };
 
   return (
     <form onSubmit={handleFormSubmit}>
-      <div className="relative flex flex-col gap-1 mb-12">
-        <div className="p-5 pt-3 bg-[#378ca1] grid grid-cols-2 gap-4 rounded-lg">
+      <div className="relative flex flex-col gap-1 mb-20">
+        <section className="p-5 pt-3 bg-secondary-bg grid sm:grid-cols-2 grid-cols-1 gap-4 rounded-lg">
           <CurrencySelect
             currencies={currencies.map((currency) => currency.currency)}
             selectedCurrency={fromCurrency}
@@ -42,20 +59,27 @@ const ConverterForm = ({ user, currencies, from, initialAmount, ...rest }) => {
           <CurrencyInput
             className="outline-none min-h-14  text-2xl text-white font-medium bg-transparent border-white"
             defaultValue={0}
-            decimalsLimit={2}
-            onValueChange={(value) => {
-              console.log(value);
-              setAmount(value);
-            }}
+            decimalsLimit={3}
+            onValueChange={handleAmountChange}
           />
-          <p className="text-white text-end">
+          <p className="text-white sm:text-end">
             Balance: {getUserBalance(user.wallet, fromCurrency)}
           </p>
-        </div>
+        </section>
 
         <div
           className="absolute right-1/2 bottom-1/2 translate-x-1/2 translate-y-1/2 h-10 w-10 cursor-pointer flex items-center justify-center rounded-full bg-white/[.1] border border-white/[.5] transition duration-200 ease"
-          onClick={handleSwapCurrencies}
+          onClick={() => {
+            if (
+              getUserBalance(user.wallet, toCurrency) < amount ||
+              getUserBalance(user.wallet, toCurrency) === 0
+            ) {
+              setErrorMsg("Insufficient balance!");
+            } else {
+              setErrorMsg(null);
+            }
+            handleSwapCurrencies();
+          }}
         >
           <svg
             height="16"
@@ -69,7 +93,7 @@ const ConverterForm = ({ user, currencies, from, initialAmount, ...rest }) => {
           </svg>
         </div>
 
-        <div className="p-5 pt-3 bg-[#378ca1] grid grid-cols-2 gap-4 rounded-lg">
+        <section className="p-5 pt-3 bg-secondary-bg grid sm:grid-cols-2 grid-cols-1 gap-4 rounded-lg">
           <CurrencySelect
             currencies={currencies.map((currency) => currency.currency)}
             selectedCurrency={toCurrency}
@@ -84,34 +108,25 @@ const ConverterForm = ({ user, currencies, from, initialAmount, ...rest }) => {
               amount *
               currencies.find((item) => item.currency === toCurrency).price
             ).toFixed(4)}
-            decimalsLimit={2}
+            decimalsLimit={3}
             disabled
           />
-          <p className="text-white text-end">
+          <p className="text-white sm:text-end">
             Balance: {getUserBalance(user.wallet, toCurrency)}
           </p>
-        </div>
+        </section>
 
-        {(amount === undefined ||
-          amount > getUserBalance(user.wallet, fromCurrency)) && (
-          <p className="text-xl font-semibold text-red-500 absolute bottom-0 translate-y-full pt-2">
-            {amount === undefined
-              ? "Please enter a valid amount"
-              : "Insufficient balance"}
-          </p>
+        {errorMsg && (
+          <div className="absolute bottom-0 translate-y-full w-full pt-2">
+            <Error>{errorMsg}</Error>
+          </div>
         )}
       </div>
 
       <button
         type="submit"
-        className={`w-full min-h-14 rounded-lg border-none outline-none text-white text-lg font-semibold cursor-pointer bg-[#074e6e] transition duration-200 ease
-         disabled:bg-[#074d6ec0] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#074e6e]
-        `}
-        disabled={
-          isLoading ||
-          !(+amount) ||
-          amount > getUserBalance(user.wallet, fromCurrency)
-        }
+        className="w-full min-h-14 rounded-lg border-none outline-none text-white text-lg font-semibold cursor-pointer bg-button-bg/90 hover:bg-button-bg transition duration-200 ease disabled:bg-button-bg/75 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-button-bg/85"
+        disabled={isLoading || errorMsg}
       >
         {isLoading ? "Loading..." : "Swap"}
       </button>
@@ -123,4 +138,3 @@ export default ConverterForm;
 
 const getUserBalance = (wallet, currency) =>
   wallet.find((item) => item.currency === currency)?.amount || 0;
-

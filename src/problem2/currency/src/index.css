@@ -17,14 +17,13 @@ body {
   justify-content: center;
   min-height: 100dvh;
   background: linear-gradient(
-  45deg,
-  #003e6b, 
-  #004d7a,
-  #005b9a,
-  #006989,
-  #0075a1 
-);
-
+    45deg,
+    #003e6b,
+    #004d7a,
+    #005b9a,
+    #006989,
+    #0075a1
+  );
 }
 
 #root {
@@ -34,9 +33,5 @@ body {
 @media (max-width: 640px) {
   body {
     padding: 0 10px;
-  }
-
-  .currency-converter {
-    padding: 30px 20px 40px;
   }
 }

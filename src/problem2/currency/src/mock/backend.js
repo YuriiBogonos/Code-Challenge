@@ -4,7 +4,7 @@ import { users } from "./user";
 export async function swap({ userId, fromCurrency, toCurrency, amount }) {
   await new Promise((resolve) => setTimeout(resolve, 1000));
   const user = users.find((user) => user.id === userId);
-  const fromCurrencyBalance = getWallet(user.wallet, fromCurrency)?.amount;
+  const fromCurrencyBalance = getWallet(user.wallet, fromCurrency)?.amount || -1;
   if (fromCurrencyBalance < amount) {
     throw new Error("Insufficient balance");
   }

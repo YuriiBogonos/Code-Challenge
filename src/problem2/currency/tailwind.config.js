@@ -5,8 +5,9 @@ module.exports = {
     extend: {
       colors: {
         "primary-bg": "#006989",
+        "secondary-bg": "#378ca1",
         "border-color": "#8dc2d0",
-        "hover-bg": "#1d8eab",
+        "button-bg": "#074e6e",
       },
     },
   },
